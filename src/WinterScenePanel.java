@@ -33,7 +33,7 @@ public class WinterScenePanel extends JPanel implements Runnable, KeyListener {
             shapes.add(new StormySnowFlake(i * 14, y, s, s, (int)(Math.random() * 2)));
         }
         
-        sMan = new SnowMan(500, 350, 200, 150);
+        sMan = new SnowMan(400, 350, 200, 150);
         
         this.addKeyListener(this);
         new Thread(this).start();
