@@ -10,56 +10,37 @@ import java.awt.Font;
 import javax.swing.JPanel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.List;
 import java.util.ArrayList;
-import java.awt.event.KeyListener;
-import java.awt.event.KeyEvent;
 
 public class WinterScenePanel extends JPanel implements Runnable, KeyListener {
 
     private List<AbstractShape> shapes;
     private AbstractShape sMan;
-
-    private boolean keyW;
+    private boolean key;
 
     public WinterScenePanel() {
         setVisible(true);
+        
         shapes = new ArrayList<AbstractShape>();
         for (int i = 0; i < 50; i++) {
             int y = (int) (Math.random() * 600);
             int s = (int) (Math.random() * 30) + 20;
-            //shapes.add(new SimpleSnowFlake(i * 14, y, s, s));
-            //shapes.add(new FancySnowFlake(i * 14, y, s, s));
-            shapes.add(new StormySnowFlake(i * 14, y, s, s, 2));
+//            shapes.add(new SimpleSnowFlake(i * 14, y, s, s));
+//            shapes.add(new FancySnowFlake(i * 14, y, s, s));
+            shapes.add(new StormySnowFlake(i * 14, y, s, s, (int)(Math.random() * 2)));
         }
+        
         sMan = new SnowMan(500, 350, 200, 150);
+        
+        this.addKeyListener(this);
         new Thread(this).start();
-
-        addKeyListener(this);
-    }
-
-    public void keyPressed(KeyEvent e) {
-        if (e.getKeyCode() == KeyEvent.VK_W) {
-            keyW = true;
-        }
-        repaint();
-    }
-
-    public void keyReleased(KeyEvent e) {
-        if (e.getKeyCode() == KeyEvent.VK_W) {
-            keyW = false;
-        }
-        repaint();
-    }
-
-    public void keyTyped(KeyEvent e) {
-        //no code needed here
     }
 
     public void update(Graphics window) {
         paint(window);
-
-        
     }
 
     public void paint(Graphics window) {
@@ -72,24 +53,44 @@ public class WinterScenePanel extends JPanel implements Runnable, KeyListener {
 
         sMan.draw(window);
         
-                if (keyW == true) {
-            shapes.removeAll(shapes);
-
-            for (int i = 0; i < 50; i++) {
-                int y = (int) (Math.random() * 600);
-                int s = (int) (Math.random() * 30) + 20;
-                shapes.add(new StormySnowFlake(i * 14, y, s, s, 20));
-            }
-        }
+        if(key == true){
+            for (AbstractShape sh : shapes) {
+                StormySnowFlake s = (StormySnowFlake) sh;
+                s.storm(window);
                 
-        for (AbstractShape sh : shapes) {
-            sh.moveAndDraw(window);
-            if (sh.getYPos() >= getHeight()) {
-                sh.setYPos(0);
+                if (s.getYPos() >= getHeight()) {
+                    s.setYPos(0);
+                }
+                
+                if (s.getXPos() >= getWidth()) {
+                    s.setXPos(0);
+                }
             }
         }
         
+        else{
+            for (AbstractShape sh : shapes) {
+                sh.moveAndDraw(window);
+                if (sh.getYPos() >= getHeight()) {
+                    sh.setYPos(0);
+                }
+            }
+        }
+    }
+    
+    public void keyPressed(KeyEvent e) {
+        if (e.getKeyCode() == KeyEvent.VK_W) {
+            key = true;
+        }
+        repaint();
+    }
 
+    public void keyReleased(KeyEvent e) {
+
+    }
+
+    public void keyTyped(KeyEvent e) {
+        //no code needed here
     }
 
     public void run() {
